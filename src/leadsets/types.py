@@ -117,7 +117,7 @@ class CompaniesSearchParams(TypedDict, total=False):
 
 
 class CompanyEnrichParams(TypedDict, total=False):
-    #: Company domain or website URL, e.g. "northwind.io".
+    #: Company domain or website URL, e.g. "example.com".
     domain: str
     linkedin_url: str
     prompt: str

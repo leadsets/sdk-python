@@ -8,7 +8,7 @@ from leadsets import Leadsets, PermissionDeniedError, ScrapeUnitsExhaustedError
 ls = Leadsets()
 
 try:
-    res = ls.scrape.jobs(domain="northwind.io", max_pages=3)
+    res = ls.scrape.jobs(domain="example.com", max_pages=3)
     print(f"{res.count} open roles at {res.careers_url}")
     for job in res.jobs:
         print(f"- {job.title} ({job.team or 'no team'}, {job.location or 'no location'})")

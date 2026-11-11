@@ -7,7 +7,7 @@ from leadsets import Leadsets
 
 ls = Leadsets()
 
-emails = ["maya@northwind.io", "sam@stackfold.com", "not-an-email", "jo@parcelry.co"]
+emails = ["jane@example.com", "sam@example.org", "not-an-email", "jo@example.net"]
 
 keep: list[str] = []
 for i in range(0, len(emails), 100):

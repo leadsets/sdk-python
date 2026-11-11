@@ -31,7 +31,7 @@ async def test_every_endpoint(als: AsyncLeadsets, mock: respx.MockRouter) -> Non
     res = await als.people.search(function=["revenue"], country="US", limit=10)
     assert isinstance(res, PeopleSearchResponse)
     assert res.items[0].match_reasons
-    assert (await als.people.enrich(email="maya@northwind.io")).matched_by == "email"
+    assert (await als.people.enrich(email="jane@example.com")).matched_by == "email"
     assert (await als.companies.search(industry="saas")).items[0].company_id == "c"
     assert (await als.companies.enrich(domain="a.co")).company.name == "N"
     assert (await als.emails.verify(["a@b.co"])).results[0].status == "invalid"

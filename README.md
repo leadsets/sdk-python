@@ -129,10 +129,10 @@ Each `Person` has `person_id`, names, `title`, `seniority` and `function` (with 
 Look a person up by LinkedIn URL, by work email, or by name plus company domain.
 
 ```python
-res = ls.people.enrich(linkedin_url="https://www.linkedin.com/in/mayachen")
-ls.people.enrich(email="maya@northwind.io")
-ls.people.enrich(full_name="Maya Chen", company_domain="northwind.io")
-ls.people.enrich(first_name="Maya", last_name="Chen", company_domain="northwind.io", include_personal_email=True)
+res = ls.people.enrich(linkedin_url="https://www.linkedin.com/in/example")
+ls.people.enrich(email="jane@example.com")
+ls.people.enrich(full_name="Jane Doe", company_domain="example.com")
+ls.people.enrich(first_name="Jane", last_name="Doe", company_domain="example.com", include_personal_email=True)
 
 print(res.person.title, res.matched_by)
 ```
@@ -155,8 +155,8 @@ print([(c.name, c.domain, c.employees) for c in res.items])
 ### Companies enrich
 
 ```python
-company = ls.companies.enrich(domain="northwind.io").company  # a URL works too
-ls.companies.enrich(linkedin_url="https://www.linkedin.com/company/northwind")
+company = ls.companies.enrich(domain="example.com").company  # a URL works too
+ls.companies.enrich(linkedin_url="https://www.linkedin.com/company/example")
 
 print(company.industry, company.naics, company.employee_range, company.revenue_range, company.technologies)
 ```
@@ -166,8 +166,8 @@ print(company.industry, company.naics, company.employee_range, company.revenue_r
 One email or up to 100 per call. Each result has a `status` (`verified`, `catch_all`, `unknown`, `invalid`), a `confidence` and `checked_at`.
 
 ```python
-one = ls.emails.verify("maya@northwind.io")
-many = ls.emails.verify(["maya@northwind.io", "sam@stackfold.com"])
+one = ls.emails.verify("jane@example.com")
+many = ls.emails.verify(["jane@example.com", "sam@example.org"])
 # or: ls.emails.verify(emails=[...])
 
 print(many.summary)  # verified, catch_all, unknown, invalid, not_checked
@@ -181,7 +181,7 @@ for r in many.results:
 A website as structured data: name, description, headings, key links (pricing, customers, careers, docs and more), social profiles and page text. `max_pages` (1–10, default 1) adds the about, pricing, customers, product and careers pages. Scraping is available on paid plans with scrape units.
 
 ```python
-site = ls.scrape.company(domain="northwind.io", max_pages=3)
+site = ls.scrape.company(domain="example.com", max_pages=3)
 print(site.name, site.key_links.get("pricing"), site.social.get("linkedin"))
 print([p.url for p in site.pages], site.usage.scrape_units_left)
 ```
@@ -191,7 +191,7 @@ print([p.url for p in site.pages], site.usage.scrape_units_left)
 Open roles from a company's careers page or job board: title, link, team, location and posted date when shown. `max_pages` defaults to 3.
 
 ```python
-res = ls.scrape.jobs(domain="northwind.io")
+res = ls.scrape.jobs(domain="example.com")
 print(res.count, res.careers_url)
 for job in res.jobs:
     print(job.title, job.team, job.location, job.url)
@@ -272,7 +272,7 @@ Every API error has a status, a machine-readable `type`, a message and a `reques
 from leadsets import APIError, NotFoundError, RateLimitError
 
 try:
-    ls.people.enrich(email="maya@northwind.io")
+    ls.people.enrich(email="jane@example.com")
 except NotFoundError:
     pass  # nothing to enrich; nothing was counted
 except RateLimitError as e:

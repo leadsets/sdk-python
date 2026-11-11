@@ -154,7 +154,7 @@ class TestEndpoints:
     def test_companies_search(self, ls: Leadsets, mock: respx.MockRouter) -> None:
         route = mock.post("/v1/companies/search").respond(
             json={
-                "items": [{"company_id": "c1", "name": "Northwind", "technologies": ["hubspot"]}],
+                "items": [{"company_id": "c1", "name": "Example", "technologies": ["hubspot"]}],
                 "next_cursor": None,
                 "usage": {"search_records_counted": 1},
                 "request_id": "r",
@@ -175,9 +175,9 @@ class TestEndpoints:
             },
             headers={"X-Leadsets-Free-Remaining": "999"},
         )
-        res = ls.people.enrich(linkedin_url="https://www.linkedin.com/in/mayachen")
-        assert body(route) == {"linkedin_url": "https://www.linkedin.com/in/mayachen"}
-        assert res.person.full_name == "Maya Chen"
+        res = ls.people.enrich(linkedin_url="https://www.linkedin.com/in/example")
+        assert body(route) == {"linkedin_url": "https://www.linkedin.com/in/example"}
+        assert res.person.full_name == "Jane Doe"
         assert res.matched_by == "linkedin_url"
         assert res.usage.enrich_records_counted == 1
         assert res.last_response is not None
@@ -186,14 +186,14 @@ class TestEndpoints:
     def test_companies_enrich(self, ls: Leadsets, mock: respx.MockRouter) -> None:
         route = mock.post("/v1/companies/enrich").respond(
             json={
-                "company": {"company_id": "c1", "name": "Northwind", "location": {"country": "US"}},
+                "company": {"company_id": "c1", "name": "Example", "location": {"country": "US"}},
                 "usage": {},
                 "request_id": "r",
             }
         )
-        res = ls.companies.enrich(domain="northwind.io")
-        assert body(route) == {"domain": "northwind.io"}
-        assert res.company.name == "Northwind"
+        res = ls.companies.enrich(domain="example.com")
+        assert body(route) == {"domain": "example.com"}
+        assert res.company.name == "Example"
         assert res.company.location.country == "US"
 
     def test_emails_verify_forms(self, ls: Leadsets, mock: respx.MockRouter) -> None:
@@ -241,14 +241,14 @@ class TestEndpoints:
     def test_scrape(self, ls: Leadsets, mock: respx.MockRouter) -> None:
         company = mock.post("/v1/scrape/company").respond(
             json={
-                "domain": "northwind.io",
-                "url": "https://northwind.io/",
-                "name": "Northwind",
+                "domain": "example.com",
+                "url": "https://example.com/",
+                "name": "Example",
                 "description": None,
                 "headings": ["Analytics"],
-                "key_links": {"pricing": "https://northwind.io/pricing"},
+                "key_links": {"pricing": "https://example.com/pricing"},
                 "social": {},
-                "pages": [{"url": "https://northwind.io/", "title": "Northwind", "description": None, "text": "hi"}],
+                "pages": [{"url": "https://example.com/", "title": "Example", "description": None, "text": "hi"}],
                 "units_used": 1,
                 "scraped_at": "x",
                 "usage": {"scrape_units_counted": 1, "scrape_units_left": 99},
@@ -257,8 +257,8 @@ class TestEndpoints:
         )
         jobs = mock.post("/v1/scrape/jobs").respond(
             json={
-                "domain": "northwind.io",
-                "careers_url": "https://northwind.io/careers",
+                "domain": "example.com",
+                "careers_url": "https://example.com/careers",
                 "jobs": [
                     {
                         "title": "AE",
@@ -277,11 +277,11 @@ class TestEndpoints:
                 "request_id": "r",
             }
         )
-        c = ls.scrape.company(domain="northwind.io", max_pages=3)
-        j = ls.scrape.jobs(domain="northwind.io")
-        assert body(company) == {"domain": "northwind.io", "max_pages": 3}
-        assert body(jobs) == {"domain": "northwind.io"}
-        assert c.key_links["pricing"] == "https://northwind.io/pricing"
+        c = ls.scrape.company(domain="example.com", max_pages=3)
+        j = ls.scrape.jobs(domain="example.com")
+        assert body(company) == {"domain": "example.com", "max_pages": 3}
+        assert body(jobs) == {"domain": "example.com"}
+        assert c.key_links["pricing"] == "https://example.com/pricing"
         assert c.pages[0].text == "hi"
         assert c.usage.scrape_units_left == 99
         assert j.jobs[0].title == "AE"
