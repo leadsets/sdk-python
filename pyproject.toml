@@ -45,8 +45,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://www.leadsets.ai/?utm_source=github&utm_medium=readme&utm_campaign=sdk-python&utm_content=pyproject"
-Documentation = "https://www.leadsets.ai/docs?utm_source=github&utm_medium=readme&utm_campaign=sdk-python&utm_content=pyproject"
+Homepage = "https://www.leadsets.ai/"
+Documentation = "https://www.leadsets.ai/docs"
 Repository = "https://github.com/leadsets/sdk-python"
 Issues = "https://github.com/leadsets/sdk-python/issues"
 Changelog = "https://github.com/leadsets/sdk-python/blob/main/CHANGELOG.md"
