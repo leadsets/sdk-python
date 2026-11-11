@@ -12,7 +12,7 @@ try:
     p = res.person
     print(f"matched by {res.matched_by}:", p.full_name, p.title, p.email.address if p.email else None)
     # Every field says where it came from and when it was last seen.
-    print("title source:", p.sources.get("title"))
+    print("title freshness:", p.sources.get("title"))
 except NotFoundError:
     # A miss costs nothing.
     print("No match; nothing was counted.")

@@ -205,7 +205,6 @@ class TestEndpoints:
                         "status": "verified",
                         "confidence": 0.95,
                         "checked_at": "x",
-                        "source": "s",
                         "mx_provider": None,
                     },
                     {
@@ -213,7 +212,6 @@ class TestEndpoints:
                         "status": None,
                         "confidence": None,
                         "checked_at": None,
-                        "source": None,
                         "mx_provider": None,
                         "reason": "not_checked: limit reached",
                     },

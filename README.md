@@ -7,7 +7,7 @@
 
 The official Python client for the [Leadsets](https://www.leadsets.ai/?utm_source=github&utm_medium=readme&utm_campaign=sdk-python&utm_content=intro) API.
 
-Leadsets is B2B data for AI agents and the developers who build them. Search people and companies, enrich a person or a company, verify emails and scrape company websites and careers pages, over a REST API or an MCP server. Every record says why it matched, every field carries its source and freshness, and emails are only labelled verified when they are.
+Leadsets is B2B data for AI agents and the developers who build them. Search people and companies, enrich a person or a company, verify emails and scrape company websites and careers pages, over a REST API or an MCP server. Every record says why it matched, every field carries when it was last checked and a confidence score, and emails are only labelled verified when they are.
 
 - Sync (`Leadsets`) and async (`AsyncLeadsets`) clients on [httpx](https://www.python-httpx.org/)
 - Typed responses (dataclasses) and typed keyword arguments, with a `py.typed` marker
@@ -119,7 +119,7 @@ for p in res.items:
     if p.email:
         print(p.email.address, p.email.status, p.email.confidence, p.email.checked_at)
     print(p.match_reasons)     # ["title", "size", "country", "verified_email"]
-    print(p.sources["title"])  # FieldSource(source=…, seen_at=…, confidence=…)
+    print(p.sources["title"])  # FieldSource(seen_at=…, confidence=…)
 ```
 
 Each `Person` has `person_id`, names, `title`, `seniority` and `function` (with finer `seniority_detail` and `function_detail`), `linkedin_url`, `location`, `company`, `email`, `refreshed_at`, `stale` and `sources`.

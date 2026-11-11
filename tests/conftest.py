@@ -81,7 +81,6 @@ def person(pid: str = "6f1c0000-0000-4000-8000-000000000001") -> dict[str, Any]:
             "type": "business",
             "confidence": 0.95,
             "checked_at": "2026-11-02T00:00:00Z",
-            "verified_by": "leadsets",
             "mx_provider": "google",
         },
         "match_reasons": ["function", "seniority", "size", "industry", "country"],
@@ -89,7 +88,7 @@ def person(pid: str = "6f1c0000-0000-4000-8000-000000000001") -> dict[str, Any]:
         "confirmed_at": "2026-11-01T00:00:00Z",
         "stale_after_at": "2027-01-05T00:00:00Z",
         "stale": False,
-        "sources": {"title": {"source": "licensed", "seen_at": "2026-11-01T00:00:00Z", "confidence": 0.9}},
+        "sources": {"title": {"seen_at": "2026-11-01T00:00:00Z", "confidence": 0.9}},
         "something_new": {"x": 1},
     }
 

@@ -171,9 +171,8 @@ class ResponseMeta:
 
 @dataclasses.dataclass(kw_only=True)
 class FieldSource(Model):
-    """Where a field came from, when it was last seen and how confident we are in it."""
+    """When a field was last seen and how confident we are in it."""
 
-    source: str | None = None
     seen_at: str | None = None
     confidence: float | None = None
 
@@ -225,7 +224,6 @@ class Email(Model):
     type: str = "business"
     confidence: float | None = None
     checked_at: str | None = None
-    verified_by: str | None = None
     mx_provider: str | None = None
 
 
@@ -330,7 +328,6 @@ class EmailVerification(Model):
     status: VerificationStatus | None = None
     confidence: float | None = None
     checked_at: str | None = None
-    source: str | None = None
     mx_provider: str | None = None
     #: Why the email was not checked, e.g. "not_checked: limit reached".
     reason: str | None = None
