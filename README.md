@@ -1,7 +1,7 @@
 # Leadsets Python SDK
 
-[![PyPI](https://img.shields.io/pypi/v/leadsets.svg)](https://pypi.org/project/leadsets/)
-[![Python](https://img.shields.io/pypi/pyversions/leadsets.svg)](https://pypi.org/project/leadsets/)
+[![PyPI](https://img.shields.io/pypi/v/leadsets?label=pypi)](https://pypi.org/project/leadsets/)
+[![Python](https://img.shields.io/pypi/pyversions/leadsets?label=python)](https://pypi.org/project/leadsets/)
 [![CI](https://github.com/leadsets/sdk-python/actions/workflows/ci.yml/badge.svg)](https://github.com/leadsets/sdk-python/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
