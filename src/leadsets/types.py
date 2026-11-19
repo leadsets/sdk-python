@@ -68,13 +68,43 @@ _StrList = str | Sequence[str]
 # ---- Request parameters ----------------------------------------------------------------------
 
 
+class PeoplePriority(TypedDict, total=False):
+    """One group of titles for ``PeopleSearchParams.priorities``, best first. ``title`` is required."""
+
+    #: Titles for this priority, fuzzy-matched like ``title``.
+    title: _StrList
+    #: Titles that rule a person out of this priority, e.g. ["assistant", "intern"].
+    exclude_title: _StrList
+    #: Replaces the top-level ``seniority`` for this priority.
+    seniority: Seniority | Sequence[Seniority]
+    #: Replaces the top-level ``function`` for this priority.
+    function: PersonFunction | Sequence[PersonFunction]
+    #: Replaces the top-level ``country`` for this priority.
+    country: _StrList
+    #: Also match these titles against the LinkedIn headline.
+    match_headline: bool
+
+
 class PeopleSearchParams(TypedDict, total=False):
     #: Job titles. Fuzzy-matched: "VP Sales" also finds "Vice President, Sales".
     title: _StrList
+    #: Also match title words against the LinkedIn headline.
+    match_headline: bool
     seniority: Seniority | Sequence[Seniority]
     function: PersonFunction | Sequence[PersonFunction]
     #: Only people at these companies (domains).
     company_domain: _StrList
+    #: With ``priorities``: the company by its LinkedIn page, instead of ``company_domain``.
+    company_linkedin_url: str
+    #: What their company does, e.g. ["clay", "gtm engineering"]: whole words in its name,
+    #: description and specialties.
+    company_keywords: _StrList
+    #: Leave out people whose company mentions any of these.
+    exclude_company_keywords: _StrList
+    #: Best contacts at ONE company (one ``company_domain`` or ``company_linkedin_url``): 1–10
+    #: groups of titles, best first. Results never repeat a person and carry ``priority``.
+    #: ``limit`` 1–25 (default 5); no cursor, no top-level ``title``.
+    priorities: Sequence[PeoplePriority]
     #: Company headcount range, e.g. "50-200", "1000+" or "<50".
     employees: str
     #: Leadsets industry slugs, e.g. "saas".
@@ -103,6 +133,11 @@ class PersonEnrichParams(TypedDict, total=False):
 
 
 class CompaniesSearchParams(TypedDict, total=False):
+    #: What the company does, e.g. ["lead generation", "appointment setting"]: whole words in its
+    #: name, description and specialties; any keyword matches.
+    keywords: _StrList
+    #: Leave out companies that mention any of these, e.g. ["pottery"].
+    exclude_keywords: _StrList
     industry: _StrList
     employees: str
     country: _StrList
@@ -203,6 +238,10 @@ class Usage(Model):
     scrape_units_left: int | None = None
     #: True when limits could not be checked for this call.
     degraded: bool | None = None
+    #: Paid plans: the limits behind the ``*_left_*`` numbers, e.g. ``search_records_5h``.
+    limits: dict[str, int] | None = None
+    #: Paid plans: when the oldest usage leaves each window (ISO 8601), e.g. ``search_5h``.
+    resets_at: dict[str, str | None] | None = None
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -232,6 +271,8 @@ class PersonCompany(Model):
     company_id: str | None = None
     name: str | None = None
     domain: str | None = None
+    #: The domain the company's work emails use, when known.
+    email_domain: str | None = None
     industry: str | None = None
     employees: int | None = None
     employee_range: str | None = None
@@ -244,6 +285,8 @@ class Person(Model):
     first_name: str | None = None
     last_name: str | None = None
     title: str | None = None
+    #: LinkedIn headline, when known.
+    headline: str | None = None
     seniority: Seniority | None = None
     #: Finer-grained seniority, e.g. "founder" or "senior".
     seniority_detail: str | None = None
@@ -258,6 +301,8 @@ class Person(Model):
     personal_email: Email | None = None
     #: Which filters this record matched (search results only).
     match_reasons: list[str] | None = None
+    #: With ``priorities``: which priority found this person (1 for the first group).
+    priority: int | None = None
     refreshed_at: str | None = None
     confirmed_at: str | None = None
     stale_after_at: str | None = None
@@ -267,9 +312,33 @@ class Person(Model):
 
 
 @dataclasses.dataclass(kw_only=True)
+class MatchedCompany(Model):
+    """With ``priorities``: the company the search was scoped to."""
+
+    company_id: str | None = None
+    name: str | None = None
+    domain: str | None = None
+    email_domain: str | None = None
+    linkedin_url: str | None = None
+
+
+@dataclasses.dataclass(kw_only=True)
 class PeopleSearchResponse(APIResponse):
     items: list[Person] = dataclasses.field(default_factory=list)
     next_cursor: str | None = None
+    #: With ``priorities``: the company that was matched, or ``None`` when none is on file.
+    company: MatchedCompany | None = None
+    #: With ``priorities``, when no company is on file for the LinkedIn page.
+    note: str | None = None
+
+
+@dataclasses.dataclass(kw_only=True)
+class CountResponse(APIResponse):
+    """``people.count`` / ``companies.count``: how many records match. Uses no records."""
+
+    count: int = 0
+    #: True when counting stopped at 10,000: there are at least ``count`` matches.
+    count_capped: bool = False
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -289,6 +358,8 @@ class Company(Model):
     company_id: str
     name: str | None = None
     domain: str | None = None
+    #: The domain its work emails use, when known (may differ from ``domain``).
+    email_domain: str | None = None
     linkedin_url: str | None = None
     industry: str | None = None
     naics: str | None = None
@@ -299,6 +370,8 @@ class Company(Model):
     founded_year: int | None = None
     description: str | None = None
     technologies: list[str] = dataclasses.field(default_factory=list)
+    #: What the company says it does (LinkedIn specialties).
+    specialties: list[str] = dataclasses.field(default_factory=list)
     match_reasons: list[str] | None = None
     refreshed_at: str | None = None
     confirmed_at: str | None = None

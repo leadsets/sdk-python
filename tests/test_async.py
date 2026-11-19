@@ -95,3 +95,12 @@ async def test_async_env_key(mock: respx.MockRouter, monkeypatch: pytest.MonkeyP
     async with AsyncLeadsets() as c:
         await c.usage.get()
     assert route.calls[0].request.headers["authorization"] == f"Bearer {KEY}"
+
+
+async def test_async_count(als: AsyncLeadsets, mock: respx.MockRouter) -> None:
+    route = mock.post("/v1/people/search").respond(json={"count": 7, "count_capped": False, "request_id": "r"})
+    res = await als.people.count(company_keywords="clay")
+    assert json.loads(route.calls[0].request.content) == {"company_keywords": "clay", "count_only": True}
+    assert res.count == 7
+    mock.post("/v1/companies/search").respond(json={"count": 2, "count_capped": False, "request_id": "r"})
+    assert (await als.companies.count(keywords="clay")).count == 2
