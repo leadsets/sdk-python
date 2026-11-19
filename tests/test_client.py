@@ -375,3 +375,57 @@ class TestEndpoints:
 def test_usage_constant_shape() -> None:
     assert USAGE["search_records_counted"] == 1
     assert BASE == DEFAULT_BASE_URL
+
+
+class TestKeywordsPrioritiesCounts:
+    def test_count_sends_count_only(self, ls: Leadsets, mock: respx.MockRouter) -> None:
+        route = mock.post("/v1/companies/search").respond(
+            json={"count": 10000, "count_capped": True, "usage": {"search_records_counted": 0}, "request_id": "r"}
+        )
+        res = ls.companies.count(keywords=["clay", "gtm engineering"], exclude_keywords="pottery", country="US")
+        assert body(route) == {
+            "keywords": ["clay", "gtm engineering"],
+            "exclude_keywords": "pottery",
+            "country": "US",
+            "count_only": True,
+        }
+        assert (res.count, res.count_capped) == (10000, True)
+        people = mock.post("/v1/people/search").respond(json={"count": 3, "count_capped": False, "request_id": "r"})
+        assert ls.people.count(company_keywords="clay", match_headline=True, title="founder").count == 3
+        sent = body(people)
+        assert isinstance(sent, dict)
+        assert sent["count_only"] is True
+
+    def test_priorities_and_new_fields(self, ls: Leadsets, mock: respx.MockRouter) -> None:
+        route = mock.post("/v1/people/search").respond(
+            json={
+                "company": {
+                    "company_id": "c1",
+                    "name": "Northwind",
+                    "domain": "northwind.io",
+                    "email_domain": "northwind.com",
+                },
+                "items": [{**person(), "priority": 1, "headline": "Founder at Northwind"}],
+                "next_cursor": None,
+                "usage": {
+                    **USAGE,
+                    "limits": {"search_records_5h": 7500},
+                    "resets_at": {"search_5h": "2026-11-19T18:30:00Z"},
+                },
+                "request_id": "r",
+            }
+        )
+        res = ls.people.search(
+            company_domain="northwind.io",
+            priorities=[{"title": ["founder", "ceo"], "match_headline": True}, {"title": "head of growth"}],
+            limit=3,
+        )
+        sent = body(route)
+        assert isinstance(sent, dict)
+        assert sent["priorities"][0] == {"title": ["founder", "ceo"], "match_headline": True}
+        assert res.company is not None
+        assert res.company.email_domain == "northwind.com"
+        assert res.items[0].priority == 1
+        assert res.items[0].headline == "Founder at Northwind"
+        assert res.usage.limits == {"search_records_5h": 7500}
+        assert res.usage.resets_at == {"search_5h": "2026-11-19T18:30:00Z"}
