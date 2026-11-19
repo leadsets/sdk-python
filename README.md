@@ -103,7 +103,23 @@ Responses are dataclasses: `res.items[0].email.status`. `obj.to_dict()` returns 
 
 ### People search
 
-Filters: `title`, `seniority` (`c_level`, `vp`, `head`, `director`, `manager`, `ic`), `function` (`revenue`, `marketing`, `engineering`, `product`, `ops`, `finance`, `hr`), `company_domain`, `employees` (`"50-200"`, `"1000+"`, `"<50"`), `industry` (slugs such as `"saas"`), `country` (ISO 3166-1 alpha-2), `has_verified_email`, `max_age_days`, `exclude_stale`, `limit` (1–100, default 25) and `cursor`. A string or a list works wherever a list is accepted.
+Filters: `title` (add `match_headline=True` to also match the LinkedIn headline), `seniority` (`c_level`, `vp`, `head`, `director`, `manager`, `ic`), `function` (`revenue`, `marketing`, `engineering`, `product`, `ops`, `finance`, `hr`), `company_domain`, `company_keywords` / `exclude_company_keywords` (what their company does), `employees` (`"50-200"`, `"1000+"`, `"<50"`), `industry` (slugs such as `"saas"`), `country` (ISO 3166-1 alpha-2), `has_verified_email`, `max_age_days`, `exclude_stale`, `limit` (1–100, default 25) and `cursor`. A string or a list works wherever a list is accepted.
+
+Count before you pull, for free, and find the best contacts at one company in your order of preference:
+
+```python
+n = ls.companies.count(keywords=["clay", "gtm engineering"], exclude_keywords=["pottery"], country="US").count
+
+res = ls.people.search(
+    company_domain="northwind.io",
+    priorities=[{"title": ["founder", "ceo"], "match_headline": True}, {"title": ["head of growth", "vp sales"]}],
+    limit=3,
+)
+for p in res.items:
+    print(p.priority, p.full_name, p.email.address if p.email else None)
+```
+
+`companies.search` also takes `keywords` and `exclude_keywords`: whole words in the company's name, description and specialties.
 
 ```python
 res = ls.people.search(

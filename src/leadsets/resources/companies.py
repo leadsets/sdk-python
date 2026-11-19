@@ -7,7 +7,14 @@ import httpx
 
 from .._base import clean
 from .._pagination import aiter_pages, iter_pages
-from ..types import CompaniesSearchParams, CompaniesSearchResponse, Company, CompanyEnrichParams, CompanyEnrichResponse
+from ..types import (
+    CompaniesSearchParams,
+    CompaniesSearchResponse,
+    Company,
+    CompanyEnrichParams,
+    CompanyEnrichResponse,
+    CountResponse,
+)
 from ._compat import Unpack
 
 if TYPE_CHECKING:
@@ -35,6 +42,29 @@ class Companies:
             body=clean(params),
             idempotent=True,
             idempotency_key=idempotency_key,
+            timeout=timeout,
+            max_retries=max_retries,
+            extra_headers=extra_headers,
+        )
+
+    def count(
+        self,
+        *,
+        timeout: float | httpx.Timeout | None = None,
+        max_retries: int | None = None,
+        extra_headers: Mapping[str, str] | None = None,
+        **params: Unpack[CompaniesSearchParams],
+    ) -> CountResponse:
+        """POST /companies/search with ``count_only``: how many match, without returning them.
+
+        Uses no records; counts as one request. Counting stops at 10,000 (``count_capped``).
+        """
+        return self._client.request(
+            "POST",
+            "/companies/search",
+            CountResponse,
+            body={**clean(params), "count_only": True},
+            idempotent=True,
             timeout=timeout,
             max_retries=max_retries,
             extra_headers=extra_headers,
@@ -137,6 +167,29 @@ class AsyncCompanies:
             body=clean(params),
             idempotent=True,
             idempotency_key=idempotency_key,
+            timeout=timeout,
+            max_retries=max_retries,
+            extra_headers=extra_headers,
+        )
+
+    async def count(
+        self,
+        *,
+        timeout: float | httpx.Timeout | None = None,
+        max_retries: int | None = None,
+        extra_headers: Mapping[str, str] | None = None,
+        **params: Unpack[CompaniesSearchParams],
+    ) -> CountResponse:
+        """POST /companies/search with ``count_only``: how many match, without returning them.
+
+        Uses no records; counts as one request. Counting stops at 10,000 (``count_capped``).
+        """
+        return await self._client.request(
+            "POST",
+            "/companies/search",
+            CountResponse,
+            body={**clean(params), "count_only": True},
+            idempotent=True,
             timeout=timeout,
             max_retries=max_retries,
             extra_headers=extra_headers,
