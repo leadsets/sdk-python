@@ -34,7 +34,8 @@ class People:
         extra_headers: Mapping[str, str] | None = None,
         **params: Unpack[PeopleSearchParams],
     ) -> PeopleSearchResponse:
-        """POST /v1/people/search. 1 search record per record returned; empty results use none."""
+        """POST /v1/people/search. 1 search record per person and 1 for their company, 1 enrichment
+        record per work email (``include_emails``); empty results use none."""
         return self._client.request(
             "POST",
             "/people/search",
@@ -159,7 +160,8 @@ class AsyncPeople:
         extra_headers: Mapping[str, str] | None = None,
         **params: Unpack[PeopleSearchParams],
     ) -> PeopleSearchResponse:
-        """POST /v1/people/search. 1 search record per record returned; empty results use none."""
+        """POST /v1/people/search. 1 search record per person and 1 for their company, 1 enrichment
+        record per work email (``include_emails``); empty results use none."""
         return await self._client.request(
             "POST",
             "/people/search",

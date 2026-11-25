@@ -87,7 +87,7 @@ Keep the key out of source control. [Join the waitlist](https://www.leadsets.ai/
 
 | Method | Endpoint | Uses |
 | --- | --- | --- |
-| `ls.people.search(**params)` | `POST /v1/people/search` | 1 search record per record returned |
+| `ls.people.search(**params)` | `POST /v1/people/search` | 1 search record per person, 1 per company, 1 enrichment record per email |
 | `ls.people.enrich(**params)` | `POST /v1/people/enrich` | 1 enrichment record when found (+1 for a personal email) |
 | `ls.companies.search(**params)` | `POST /v1/companies/search` | 1 search record per record returned |
 | `ls.companies.enrich(**params)` | `POST /v1/companies/enrich` | 1 enrichment record when found |
@@ -103,7 +103,9 @@ Responses are dataclasses: `res.items[0].email.status`. `obj.to_dict()` returns 
 
 ### People search
 
-Filters: `title` (add `match_headline=True` to also match the LinkedIn headline), `seniority` (`c_level`, `vp`, `head`, `director`, `manager`, `ic`), `function` (`revenue`, `marketing`, `engineering`, `product`, `ops`, `finance`, `hr`), `company_domain`, `company_keywords` / `exclude_company_keywords` (what their company does), `employees` (`"50-200"`, `"1000+"`, `"<50"`), `industry` (slugs such as `"saas"`), `country` (ISO 3166-1 alpha-2), `has_verified_email`, `max_age_days`, `exclude_stale`, `limit` (1–100, default 25) and `cursor`. A string or a list works wherever a list is accepted.
+Filters: `title` (add `match_headline=True` to also match the LinkedIn headline), `seniority` (`c_level`, `vp`, `head`, `director`, `manager`, `ic`), `function` (`revenue`, `marketing`, `engineering`, `product`, `ops`, `finance`, `hr`), `company_domain`, `company_keywords` / `exclude_company_keywords` (what their company does), `employees` (`"50-200"`, `"1000+"`, `"<50"`), `industry` (slugs such as `"saas"`), `country` (ISO 3166-1 alpha-2), `has_verified_email`, `include_company`, `include_emails`, `max_age_days`, `exclude_stale`, `limit` (1–100, default 25) and `cursor`. A string or a list works wherever a list is accepted.
+
+Each person is one search record and their company another: pass `include_company=False` for people only. Work emails come with `include_emails=True` (or `has_verified_email`) and use 1 enrichment record each.
 
 Count before you pull, for free, and find the best contacts at one company in your order of preference:
 
@@ -113,6 +115,7 @@ n = ls.companies.count(keywords=["clay", "gtm engineering"], exclude_keywords=["
 res = ls.people.search(
     company_domain="northwind.io",
     priorities=[{"title": ["founder", "ceo"], "match_headline": True}, {"title": ["head of growth", "vp sales"]}],
+    include_emails=True,
     limit=3,
 )
 for p in res.items:
