@@ -15,6 +15,7 @@ res = ls.people.search(
     employees="20-200",
     country="US",
     industry="saas",
+    include_emails=True,  # 1 enrichment record per email
     limit=10,
 )
 

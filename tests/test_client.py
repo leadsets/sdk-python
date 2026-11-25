@@ -396,6 +396,17 @@ class TestKeywordsPrioritiesCounts:
         assert isinstance(sent, dict)
         assert sent["count_only"] is True
 
+    def test_include_options(self, ls: Leadsets, mock: respx.MockRouter) -> None:
+        bare = {k: v for k, v in person().items() if k not in ("company", "email")}
+        route = mock.post("/v1/people/search").respond(
+            json={"items": [bare], "next_cursor": None, "usage": {"enrich_records_counted": 0}, "request_id": "r"}
+        )
+        res = ls.people.search(include_company=False, include_emails=True)
+        assert body(route) == {"include_company": False, "include_emails": True}
+        assert res.items[0].company is None
+        assert res.items[0].email is None
+        assert res.usage.enrich_records_counted == 0
+
     def test_priorities_and_new_fields(self, ls: Leadsets, mock: respx.MockRouter) -> None:
         route = mock.post("/v1/people/search").respond(
             json={
