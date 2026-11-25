@@ -36,7 +36,7 @@ def resolve_api_key(api_key: str | None) -> str:
     if not key:
         raise LeadsetsError(
             "No API key. Pass one to Leadsets(api_key) or set the LEADSETS_API_KEY environment variable. "
-            "Get a free key at https://www.leadsets.ai/signup."
+            "Join the waitlist at https://www.leadsets.ai/signup (public launch 10 December 2026)."
         )
     return key
 
