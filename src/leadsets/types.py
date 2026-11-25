@@ -112,6 +112,11 @@ class PeopleSearchParams(TypedDict, total=False):
     #: ISO 3166-1 alpha-2 country codes, e.g. "US".
     country: _StrList
     has_verified_email: bool
+    #: Company details on each person (default True): one more search record per person.
+    include_company: bool
+    #: The work email on each person when one is found (default False, on with
+    #: ``has_verified_email``): 1 enrichment record each.
+    include_emails: bool
     max_age_days: int
     exclude_stale: bool
     #: 1–100. Default 25. Free plan: at most 10.
@@ -295,7 +300,9 @@ class Person(Model):
     function_detail: str | None = None
     linkedin_url: str | None = None
     location: Location = dataclasses.field(default_factory=Location)
+    #: None when left out with ``include_company=False``.
     company: PersonCompany | None = None
+    #: On ``people.search``, set only with ``include_emails`` or ``has_verified_email``.
     email: Email | None = None
     #: Present on ``people.enrich`` with ``include_personal_email``.
     personal_email: Email | None = None
