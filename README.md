@@ -93,7 +93,7 @@ Keep the key out of source control. A free key is available at [leadsets.ai/sign
 | `ls.companies.enrich(**params)` | `POST /v1/companies/enrich` | 1 enrichment record when found |
 | `ls.emails.verify(email_or_emails)` | `POST /v1/emails/verify` | 1 enrichment record per email checked |
 | `ls.scrape.company(**params)` | `POST /v1/scrape/company` | 1 scrape unit per page read |
-| `ls.scrape.jobs(**params)` | `POST /v1/scrape/jobs` | 1 scrape unit per page read |
+| `ls.scrape.jobs(**params)` | `POST /v1/scrape/jobs` | 1 scrape unit per role returned |
 | `ls.jobs.get(job_id)` | `GET /v1/jobs/{id}` | nothing |
 | `ls.usage.get()` | `GET /v1/usage` | nothing |
 
@@ -207,10 +207,10 @@ print([p.url for p in site.pages], site.usage.scrape_units_left)
 
 ### Scrape open roles
 
-Open roles at a company from its website only: its careers page, the job board it uses and LinkedIn's public job listings, merged without repeats. Each role has title, link, team, location, posted date when shown, and `source`. `max_pages` (default 3) covers every source, at 1 scrape unit per page read.
+Open roles at a company from its website only: its careers page, the job board it uses and LinkedIn's public job listings, merged without repeats. Each role has title, link, team, location, posted date when shown, and `source`. It counts 1 scrape unit per role returned; `limit` (default 25) caps the roles, and `max_pages` (default 3, not charged) caps the pages read across every source.
 
 ```python
-res = ls.scrape.jobs(domain="example.com")
+res = ls.scrape.jobs(domain="example.com", limit=10)
 print(res.count, res.careers_url, res.sources)
 for job in res.jobs:
     print(job.source, job.title, job.location, job.url)

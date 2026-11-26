@@ -271,16 +271,18 @@ class TestEndpoints:
                     }
                 ],
                 "count": 1,
-                "units_used": 2,
+                "limited": True,
+                "units_used": 1,
+                "pages_read": 2,
                 "scraped_at": "x",
-                "usage": {"scrape_units_counted": 2, "scrape_units_left": 97},
+                "usage": {"scrape_units_counted": 1, "scrape_units_left": 98},
                 "request_id": "r",
             }
         )
         c = ls.scrape.company(domain="example.com", max_pages=3)
-        j = ls.scrape.jobs(domain="example.com")
+        j = ls.scrape.jobs(domain="example.com", limit=1)
         assert body(company) == {"domain": "example.com", "max_pages": 3}
-        assert body(jobs) == {"domain": "example.com"}
+        assert body(jobs) == {"domain": "example.com", "limit": 1}
         assert c.key_links["pricing"] == "https://example.com/pricing"
         assert c.pages[0].text == "hi"
         assert c.usage.scrape_units_left == 99
@@ -288,6 +290,7 @@ class TestEndpoints:
         assert j.count == 1
         assert j.company == "Example"
         assert j.sources.linkedin is True
+        assert (j.limited, j.units_used, j.pages_read) == (True, 1, 2)
 
     def test_jobs_get(self, ls: Leadsets, mock: respx.MockRouter) -> None:
         route = mock.get("/v1/jobs/job%201").respond(
