@@ -207,13 +207,13 @@ print([p.url for p in site.pages], site.usage.scrape_units_left)
 
 ### Scrape open roles
 
-Open roles from a company's careers page or job board: title, link, team, location and posted date when shown. `max_pages` defaults to 3.
+Open roles at a company from its website only: its careers page, the job board it uses and LinkedIn's public job listings, merged without repeats. Each role has title, link, team, location, posted date when shown, and `source`. `max_pages` (default 3) covers every source, at 1 scrape unit per page read.
 
 ```python
 res = ls.scrape.jobs(domain="example.com")
-print(res.count, res.careers_url)
+print(res.count, res.careers_url, res.sources)
 for job in res.jobs:
-    print(job.title, job.team, job.location, job.url)
+    print(job.source, job.title, job.location, job.url)
 ```
 
 ### Async jobs

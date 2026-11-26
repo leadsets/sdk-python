@@ -256,7 +256,9 @@ class TestEndpoints:
         jobs = mock.post("/v1/scrape/jobs").respond(
             json={
                 "domain": "example.com",
+                "company": "Example",
                 "careers_url": "https://example.com/careers",
+                "sources": {"careers_page": True, "job_board": False, "linkedin": True},
                 "jobs": [
                     {
                         "title": "AE",
@@ -284,6 +286,8 @@ class TestEndpoints:
         assert c.usage.scrape_units_left == 99
         assert j.jobs[0].title == "AE"
         assert j.count == 1
+        assert j.company == "Example"
+        assert j.sources.linkedin is True
 
     def test_jobs_get(self, ls: Leadsets, mock: respx.MockRouter) -> None:
         route = mock.get("/v1/jobs/job%201").respond(
