@@ -182,7 +182,10 @@ class ScrapeParams(TypedDict, total=False):
 class ScrapeJobsParams(TypedDict, total=False):
     #: Required. The company website, e.g. "example.com" or "https://example.com".
     domain: Required[str]
-    #: Pages to read across every source (careers page, job board, LinkedIn), 1–10. Default 3.
+    #: Open roles to return at most, 1–500. Default 25. 1 scrape unit per role returned; once this
+    #: many are found, no more pages are read.
+    limit: int
+    #: Pages to read across every source (careers page, job board, LinkedIn), 1–10. Default 3. Not charged.
     max_pages: int
 
 
@@ -502,7 +505,12 @@ class ScrapeJobsResponse(APIResponse):
     sources: JobSources = dataclasses.field(default_factory=JobSources)
     jobs: list[Job] = dataclasses.field(default_factory=list)
     count: int = 0
+    #: True when ``limit`` cut the list short: more roles were found, or pages were left unread.
+    limited: bool = False
+    #: Scrape units counted: the roles returned.
     units_used: int = 0
+    #: Pages read to find them (not charged).
+    pages_read: int = 0
     scraped_at: str | None = None
 
 
