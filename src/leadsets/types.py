@@ -8,8 +8,14 @@ Responses are dataclasses built from the JSON. Every response object also has
 from __future__ import annotations
 
 import dataclasses
+import sys
 from collections.abc import Sequence
 from typing import Literal, TypedDict
+
+if sys.version_info >= (3, 11):
+    from typing import Required
+else:  # pragma: no cover
+    from typing_extensions import Required
 
 import httpx
 
@@ -31,6 +37,7 @@ __all__ = [
     "FieldSource",
     "FreeMeters",
     "Job",
+    "JobSources",
     "Location",
     "PeopleSearchParams",
     "PeopleSearchResponse",
@@ -43,6 +50,7 @@ __all__ = [
     "RateLimitInfo",
     "ResponseMeta",
     "ScrapeCompanyResponse",
+    "ScrapeJobsParams",
     "ScrapeJobsResponse",
     "ScrapeParams",
     "ScrapedPage",
@@ -168,6 +176,13 @@ class ScrapeParams(TypedDict, total=False):
     #: A specific page to start from (overrides domain).
     url: str
     #: Pages to read, 1–10. 1 scrape unit per page read.
+    max_pages: int
+
+
+class ScrapeJobsParams(TypedDict, total=False):
+    #: Required. The company website, e.g. "example.com" or "https://example.com".
+    domain: Required[str]
+    #: Pages to read across every source (careers page, job board, LinkedIn), 1–10. Default 3.
     max_pages: int
 
 
@@ -463,15 +478,28 @@ class Job(Model):
     location: str | None = None
     team: str | None = None
     posted: str | None = None
-    #: Where the role is listed, e.g. "greenhouse", "lever" or "site".
+    #: Where the role is listed: "greenhouse", "lever", "ashby", "workable", "recruitee",
+    #: "smartrecruiters", "bamboohr", "site" or "linkedin".
     source: str | None = None
     found_on: str | None = None
 
 
 @dataclasses.dataclass(kw_only=True)
+class JobSources(Model):
+    careers_page: bool = False
+    job_board: bool = False
+    linkedin: bool = False
+
+
+@dataclasses.dataclass(kw_only=True)
 class ScrapeJobsResponse(APIResponse):
     domain: str
-    careers_url: str
+    #: The company name searched on LinkedIn.
+    company: str | None = None
+    #: None when no careers page could be read (roles may still come from LinkedIn).
+    careers_url: str | None = None
+    #: Which sources were read.
+    sources: JobSources = dataclasses.field(default_factory=JobSources)
     jobs: list[Job] = dataclasses.field(default_factory=list)
     count: int = 0
     units_used: int = 0

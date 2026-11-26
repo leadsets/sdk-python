@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import httpx
 
 from .._base import clean
-from ..types import ScrapeCompanyResponse, ScrapeJobsResponse, ScrapeParams
+from ..types import ScrapeCompanyResponse, ScrapeJobsParams, ScrapeJobsResponse, ScrapeParams
 from ._compat import Unpack
 
 if TYPE_CHECKING:
@@ -46,9 +46,10 @@ class Scrape:
         timeout: float | httpx.Timeout | None = None,
         max_retries: int | None = None,
         extra_headers: Mapping[str, str] | None = None,
-        **params: Unpack[ScrapeParams],
+        **params: Unpack[ScrapeJobsParams],
     ) -> ScrapeJobsResponse:
-        """POST /v1/scrape/jobs. 1 scrape unit per page read (default up to 3). Paid plans with scrape units."""
+        """POST /v1/scrape/jobs: open roles from the careers page, job board and LinkedIn, from the website only.
+        1 scrape unit per page read (default up to 3). Paid plans with scrape units."""
         return self._client.request(
             "POST",
             "/scrape/jobs",
@@ -95,9 +96,10 @@ class AsyncScrape:
         timeout: float | httpx.Timeout | None = None,
         max_retries: int | None = None,
         extra_headers: Mapping[str, str] | None = None,
-        **params: Unpack[ScrapeParams],
+        **params: Unpack[ScrapeJobsParams],
     ) -> ScrapeJobsResponse:
-        """POST /v1/scrape/jobs. 1 scrape unit per page read (default up to 3). Paid plans with scrape units."""
+        """POST /v1/scrape/jobs: open roles from the careers page, job board and LinkedIn, from the website only.
+        1 scrape unit per page read (default up to 3). Paid plans with scrape units."""
         return await self._client.request(
             "POST",
             "/scrape/jobs",
