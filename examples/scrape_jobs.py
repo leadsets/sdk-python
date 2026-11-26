@@ -1,4 +1,6 @@
-"""Open roles from a company's careers page, job board and LinkedIn: a hiring signal. Needs a paid plan with scrape units.
+"""Open roles from a company's careers page, job board and LinkedIn: a hiring signal.
+
+Needs a paid plan with scrape units.
 
 Run: LEADSETS_API_KEY=ls_live_… python examples/scrape_jobs.py
 """
