@@ -49,7 +49,7 @@ class Scrape:
         **params: Unpack[ScrapeJobsParams],
     ) -> ScrapeJobsResponse:
         """POST /v1/scrape/jobs: open roles from the careers page, job board and LinkedIn, from the website only.
-        1 scrape unit per page read (default up to 3). Paid plans with scrape units."""
+        1 scrape unit per role returned (``limit``, default 25). Paid plans with scrape units."""
         return self._client.request(
             "POST",
             "/scrape/jobs",
@@ -99,7 +99,7 @@ class AsyncScrape:
         **params: Unpack[ScrapeJobsParams],
     ) -> ScrapeJobsResponse:
         """POST /v1/scrape/jobs: open roles from the careers page, job board and LinkedIn, from the website only.
-        1 scrape unit per page read (default up to 3). Paid plans with scrape units."""
+        1 scrape unit per role returned (``limit``, default 25). Paid plans with scrape units."""
         return await self._client.request(
             "POST",
             "/scrape/jobs",
